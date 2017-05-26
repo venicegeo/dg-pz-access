@@ -13,13 +13,15 @@ node {
     sh """
       ${mvn}/bin/mvn install -U 
     """
-  }
+  } 
+   stage('Setup') {
+     git([
+      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
+       branch: "master"
+     ])
+   }
 
   stage('Archive') {
-    git([
-      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
-      branch: "master"
-    ])
     sh """
       ${mvn}/bin/mvn clean package -U 
       cp target/piazza-access-1.0.0.jar ${root}/pz-access.jar
@@ -36,7 +38,7 @@ node {
   stage('Integration Testing') {
     postman()
   }
-
+   
   stage('Reset') {
     git([
       url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/pz-access',
