@@ -11,7 +11,7 @@ node {
       branch: "master"
     ])
     sh """
-      ${mvn}/bin/mvn clean install -U Dmaven.repo.local=${root}
+      ${mvn}/bin/mvn clean install -U -Dmaven.repo.local=${root}
     """
   }
 
