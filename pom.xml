@@ -15,14 +15,6 @@
 		<version>1.4.1.RELEASE</version>
 	</parent>
 
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<url>https://nexus.devops.geointservices.io/content/repositories/Piazza-Group/</url>
-		</repository>
-	</repositories>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -44,7 +36,7 @@
 		<dependency>
 			<groupId>org.venice.piazza</groupId>
 			<artifactId>pz-jobcommon</artifactId>
-			<version>ato-sprite-104-g4f1fc61</version>
+			<version>LATEST</version>
 		</dependency>
 
 		<dependency>
