@@ -1,6 +1,5 @@
 @Library('pipelib@master') _
 
-def THREADFIX_ID = env.THREADFIX_ID ? env.THREADFIX_ID : '115'
 
 node {
   def mvn = tool 'M3'
@@ -8,42 +7,35 @@ node {
 
   stage('Setup') {
     git([
-      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/pz-access',
+      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
       branch: "master"
     ])
   }
+ stage('Build/Install Job Common') {
+    git([
+      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-jobcommon',
+      branch: "master"
+    ])
+    sh """
+      ${mvn}/bin/mvn clean install -U Dmaven.repo.local=${root}
+    """
+  }
 
   stage('Archive') {
+    git([
+      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
+      branch: "master"
+    ])
     sh """
       ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
       cp target/piazza-access-1.0.0.jar ${root}/pz-access.jar
     """
-    mavenPush()
-  }
-
-  stage('Scans') {
-    dependencyCheck {
-      threadfixId = THREADFIX_ID
-    }
-    ionConnect()
-    sh """
-      mkdir -p ${root}/.m2/repository
-      ${mvn}/bin/mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install \
-        -Dmaven.repo.local=${root}/.m2/repository \
-        -Pcoverage-per-test org.jacoco:jacoco-maven-plugin:report \
-        -DdataFile=target/jacoco.exec
-    """
-    sonar()
   }
 
   stage('CI Deploy') {
     sh """
       cp target/piazza-access-1.0.0.jar ${root}/pz-access.jar
     """
-    cfPush()
-    zap {
-      threadfixId = THREADFIX_ID
-    }
     cfBgDeploy()
   }
 
@@ -60,21 +52,12 @@ node {
 
   stage('Staging Deploy') {
     cfPush {
-      cfDomain  = 'stage.geointservices.io'
+      cfDomain  = 'apps.sys.coastline.dg-cf-test.net'
       cfSpace   = 'stage'
     }
     cfBgDeploy {
-      cfDomain  = 'stage.geointservices.io'
+      cfDomain  = 'apps.sys.coastline.dg-cf-test.net'
       cfSpace   = 'stage'
-    }
-  }
-
-  stage('Final Scans') {
-    sh """
-      ${mvn}/bin/mvn install:install-file -Dmaven.repo.local=${root} -Dfile=pom.xml -DpomFile=pom.xml
-    """
-    fortify {
-      threadfixId = THREADFIX_ID
     }
   }
 
