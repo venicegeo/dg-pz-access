@@ -15,13 +15,6 @@ node {
     """
   }
 
-  stage('Setup') {
-    git([
-      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
-      branch: "master"
-    ])
-  }
-
   stage('Archive') {
     sh """
       ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
