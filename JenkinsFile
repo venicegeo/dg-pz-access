@@ -25,35 +25,6 @@ node {
     """
   }
 
-  stage('CI Deploy') {
-    sh """
-      cp target/piazza-access-1.0.0.jar ${root}/pz-access.jar
-    """
-    cfBgDeploy()
-  }
-
-  stage('Integration Testing') {
-    postman()
-  }
-   
-  stage('Reset') {
-    git([
-      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/pz-access',
-      branch: "master"
-    ])
-  }
-
-  stage('Staging Deploy') {
-    cfPush {
-      cfDomain  = 'apps.sys.coastline.dg-cf-test.net'
-      cfSpace   = 'stage'
-    }
-    cfBgDeploy {
-      cfDomain  = 'apps.sys.coastline.dg-cf-test.net'
-      cfSpace   = 'stage'
-    }
-  }
-
   stage('Cleanup') {
     deleteDir()
   }
