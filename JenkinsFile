@@ -5,12 +5,6 @@ node {
   def mvn = tool 'M3'
   def root = pwd()
 
-  stage('Setup') {
-    git([
-      url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
-      branch: "master"
-    ])
-  }
  stage('Build/Install Job Common') {
     git([
       url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-jobcommon',
@@ -21,11 +15,14 @@ node {
     """
   }
 
-  stage('Archive') {
+  stage('Setup') {
     git([
       url: env.GIT_URL ? env.GIT_URL : 'https://github.com/venicegeo/dg-pz-access',
       branch: "master"
     ])
+  }
+
+  stage('Archive') {
     sh """
       ${mvn}/bin/mvn clean package -U -Dmaven.repo.local=${root}
       cp target/piazza-access-1.0.0.jar ${root}/pz-access.jar
