@@ -28,8 +28,4 @@ node {
  stage('CI Deploy') {
        cfPush()
   }
-
-  stage('Cleanup') {
-    deleteDir()
-  }
 }
